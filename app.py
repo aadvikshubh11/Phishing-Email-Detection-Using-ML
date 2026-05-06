@@ -17,6 +17,9 @@ def load_artifacts():
     model = joblib.load(MODEL_PATH)
 
 
+load_artifacts()
+
+
 def explain_prediction(text, top_n=4):
     if model is None:
         return {}
@@ -33,6 +36,7 @@ def explain_prediction(text, top_n=4):
         {"feature": feature_names[i], "score": float(contributions[i])}
         for i in sorted_idx[:top_n]
     ]
+
     positive = [
         {"feature": feature_names[i], "score": float(contributions[i])}
         for i in sorted_idx[-top_n:][::-1]
@@ -49,13 +53,19 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     email_text = request.form.get("email_text", "").strip()
+
     if not email_text:
-        return render_template("index.html", error="Please enter the email text to analyze.")
+        return render_template(
+            "index.html",
+            error="Please enter the email text to analyze."
+        )
 
     prediction = model.predict([email_text])[0]
     probabilities = model.predict_proba([email_text])[0]
+
     result = "Phishing" if prediction == 1 else "Legitimate"
     confidence = max(probabilities) * 100
+
     explanation = explain_prediction(email_text)
 
     return render_template(
@@ -70,15 +80,22 @@ def predict():
 @app.route("/api/predict", methods=["POST"])
 def api_predict():
     data = request.get_json(force=True)
+
     if not data or "email_text" not in data:
-        return jsonify({"error": "Provide JSON with the key 'email_text'."}), 400
+        return jsonify(
+            {"error": "Provide JSON with the key 'email_text'."}
+        ), 400
 
     email_text = data["email_text"].strip()
+
     if not email_text:
-        return jsonify({"error": "email_text cannot be empty."}), 400
+        return jsonify(
+            {"error": "email_text cannot be empty."}
+        ), 400
 
     prediction = model.predict([email_text])[0]
     probabilities = model.predict_proba([email_text])[0].tolist()
+
     explanation = explain_prediction(email_text)
 
     return jsonify(
@@ -94,5 +111,4 @@ def api_predict():
 
 
 if __name__ == "__main__":
-    load_artifacts()
     app.run(debug=True, host="0.0.0.0", port=5000)
