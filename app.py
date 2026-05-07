@@ -65,11 +65,7 @@ def predict():
 
     result = "Phishing" if prediction == 1 else "Legitimate"
     confidence = max(probabilities) * 100
-<<<<<<< HEAD
     confidence_display = f"{confidence:.2f}%"
-=======
-
->>>>>>> c062a192edd7ef79b9bb82091452f822e967fb5e
     explanation = explain_prediction(email_text)
 
     return render_template(

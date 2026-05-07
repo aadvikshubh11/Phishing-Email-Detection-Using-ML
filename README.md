@@ -35,6 +35,24 @@ python app.py
 
 Open `http://127.0.0.1:5000` in your browser to test email text input.
 
+## Deploy on Vercel
+
+1. Make sure your repository includes the trained model artifact at `model/phishing_pipeline.joblib`.
+2. If you do not already have Vercel installed, run:
+   ```powershell
+   npm install -g vercel
+   ```
+3. Log in to Vercel:
+   ```powershell
+   vercel login
+   ```
+4. Deploy from the project root:
+   ```powershell
+   vercel --prod
+   ```
+
+This project uses a static frontend at `index.html` and a serverless prediction endpoint at `api/predict.py`.
+
 ## What changed
 
 - `features.py` now extracts extra email metadata like URL count, exclamation use, digit frequency, uppercase ratio, and suspicious keywords.
