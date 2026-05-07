@@ -56,12 +56,14 @@ def predict():
     probabilities = model.predict_proba([email_text])[0]
     result = "Phishing" if prediction == 1 else "Legitimate"
     confidence = max(probabilities) * 100
+    confidence_display = f"{confidence:.2f}%"
     explanation = explain_prediction(email_text)
 
     return render_template(
         "index.html",
         result=result,
-        confidence=f"{confidence:.2f}%",
+        confidence=confidence,
+        confidence_display=confidence_display,
         email_text=email_text,
         explanation=explanation,
     )
