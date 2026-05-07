@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/predict.py": {
-      "runtime": "python3"
+      "runtime": "python3.9"
     }
   },
   "routes": [
