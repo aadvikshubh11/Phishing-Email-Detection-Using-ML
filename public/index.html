@@ -6,383 +6,649 @@
     <title>Phishing Email Detector</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+      :root {
+        color-scheme: dark;
+        --bg: #050b16;
+        --surface: rgba(18, 28, 50, 0.88);
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #eef5ff;
+        --muted: #94a6c1;
+        --accent: #4d8cff;
+        --danger: #ff6c78;
+        --success: #45d6a3;
+        --warning: #f5c644;
+        --shadow: 0 30px 80px rgba(0, 0, 0, 0.32);
+      }
+
       * {
         box-sizing: border-box;
       }
 
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      html, body {
         margin: 0;
-        padding: 0;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
+        min-height: 100%;
+        background: radial-gradient(circle at top left, rgba(77, 140, 255, 0.18), transparent 18%),
+                    radial-gradient(circle at 90% 20%, rgba(255, 108, 120, 0.16), transparent 18%),
+                    linear-gradient(180deg, #020612 0%, #081428 45%, #020612 100%);
+        color: var(--text);
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+
+      .page-shell {
+        width: 100%;
+        max-width: 1180px;
+      }
+
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.25rem 1.4rem;
+        border-radius: 24px;
+        background: rgba(8, 15, 31, 0.82);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(20px);
+        box-shadow: var(--shadow);
+      }
+
+      .brand {
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 1rem;
       }
 
-      .container {
-        max-width: 800px;
-        width: 100%;
-        margin: 2rem;
-        background: #fff;
-        padding: 3rem;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        position: relative;
-        overflow: hidden;
+      .brand-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #4d8cff, #8c5cff);
+        color: white;
+        box-shadow: 0 18px 40px rgba(77, 140, 255, 0.28);
       }
 
-      .container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+      .brand-title strong {
+        display: block;
+        font-size: 1.25rem;
+        letter-spacing: -0.02em;
       }
 
-      .header {
-        text-align: center;
-        margin-bottom: 2rem;
+      .brand-subtitle {
+        color: var(--muted);
+        font-size: 0.95rem;
       }
 
-      .header i {
-        font-size: 3rem;
-        color: #667eea;
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.85rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .status-chip i {
+        color: var(--accent);
+      }
+
+      .hero-grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: 1.2fr 0.8fr;
+        margin-top: 1.7rem;
+      }
+
+      .hero-panel {
+        padding: 1.75rem;
+        border-radius: 28px;
+        background: rgba(13, 24, 44, 0.92);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        color: var(--accent);
+        font-size: 0.92rem;
+        font-weight: 700;
+        letter-spacing: 0.17em;
+        text-transform: uppercase;
         margin-bottom: 1rem;
       }
 
-      h1 {
-        color: #2d3748;
-        margin: 0 0 0.5rem 0;
-        font-size: 2.5rem;
+      .hero-panel h1 {
+        margin: 0;
+        font-size: clamp(2.1rem, 4vw, 3.3rem);
+        line-height: 1.05;
+      }
+
+      .hero-copy {
+        margin: 1.2rem 0 1.6rem;
+        color: var(--muted);
+        line-height: 1.72;
+        max-width: 610px;
+      }
+
+      .hero-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.85rem;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.8rem 1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+
+      .chip i {
+        color: var(--accent);
+      }
+
+      .metric-card {
+        padding: 1rem 1.15rem;
+        margin-bottom: 1rem;
+        border-radius: 22px;
+        background: rgba(14, 24, 44, 0.96);
+        border: 1px solid var(--border);
+      }
+
+      .metric-title {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .metric-value {
+        font-size: 1.35rem;
         font-weight: 700;
       }
 
-      .subtitle {
-        color: #718096;
-        font-size: 1.1rem;
+      .dashboard-grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: 1.25fr 0.75fr;
+        margin-top: 1.7rem;
+      }
+
+      .card {
+        border-radius: 28px;
+        background: rgba(11, 19, 34, 0.92);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+      }
+
+      .card-content {
+        padding: 1.6rem;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.4rem;
+      }
+
+      .card-header h2 {
         margin: 0;
+        font-size: 1.12rem;
       }
 
-      .message {
-        margin: 1.5rem 0;
-        padding: 1.25rem;
-        border-radius: 12px;
-        border-left: 4px solid;
-        animation: slideIn 0.3s ease-out;
-        display: none;
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.65rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.88rem;
+        font-weight: 700;
       }
 
-      @keyframes slideIn {
-        from { transform: translateY(-10px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
+      .badge.success {
+        background: rgba(69, 214, 163, 0.16);
+        color: #c7ffe0;
       }
 
-      .success {
-        background: linear-gradient(135deg, #d4edda, #c3e6cb);
-        color: #155724;
-        border-left-color: #28a745;
+      .badge.danger {
+        background: rgba(255, 108, 120, 0.18);
+        color: #ffd2d8;
       }
 
-      .error {
-        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-        color: #721c24;
-        border-left-color: #dc3545;
+      .badge.warning {
+        background: rgba(245, 198, 68, 0.18);
+        color: #fff8d3;
       }
 
-      .result-highlight {
-        font-size: 1.2rem;
-        font-weight: 600;
+      .status-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.4rem;
+      }
+
+      .status-card {
+        flex: 1 1 180px;
+        padding: 1rem 1.1rem;
+        border-radius: 22px;
+        background: rgba(14, 24, 44, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .status-card span {
+        color: var(--muted);
+        display: block;
         margin-bottom: 0.5rem;
+        font-size: 0.95rem;
       }
 
-      .confidence-bar {
+      .status-card strong {
+        font-size: 1.35rem;
+      }
+
+      .result-summary {
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      .gauge-ring {
+        width: 178px;
+        height: 178px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        position: relative;
+        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 60%),
+                    conic-gradient(var(--gauge-color, var(--accent)) calc(var(--progress, 0) * 1%), rgba(255, 255, 255, 0.08) 0);
+      }
+
+      .gauge-ring::before {
+        content: '';
+        position: absolute;
+        inset: 16px;
+        border-radius: 50%;
+        background: rgba(11, 18, 34, 0.98);
+      }
+
+      .gauge-inner {
+        position: relative;
+        z-index: 1;
+        width: 118px;
+        height: 118px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(14, 24, 44, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .gauge-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+      }
+
+      .gauge-text {
+        margin-top: 0.35rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .progress-track {
         width: 100%;
-        height: 8px;
-        background: #e2e8f0;
-        border-radius: 4px;
+        height: 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
         overflow: hidden;
-        margin-top: 0.5rem;
       }
 
-      .confidence-fill {
+      .progress-fill {
+        width: 0;
         height: 100%;
-        background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcf7f);
-        transition: width 0.5s ease;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #4d8cff, #27d4ff);
+        transition: width 1.1s ease;
       }
 
-      .form-group {
-        margin: 2rem 0;
+      .input-card textarea {
+        width: 100%;
+        min-height: 240px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text);
+        padding: 1.2rem;
+        resize: vertical;
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .input-card textarea:focus {
+        outline: none;
+        border-color: rgba(77, 140, 255, 0.75);
+        box-shadow: 0 0 0 4px rgba(77, 140, 255, 0.12);
       }
 
       .form-label {
-        display: block;
-        margin-bottom: 0.75rem;
-        font-weight: 600;
-        color: #4a5568;
-        font-size: 1.1rem;
-      }
-
-      textarea {
-        width: 100%;
-        min-height: 200px;
-        padding: 1rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        margin-bottom: 1rem;
         font-size: 1rem;
-        line-height: 1.5;
-        resize: vertical;
-        transition: all 0.3s ease;
-        font-family: inherit;
       }
 
-      textarea:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      .form-label i {
+        color: var(--accent);
       }
 
-      textarea::placeholder {
-        color: #a0aec0;
+      .helper-text {
+        margin-top: 0.7rem;
+        color: var(--muted);
+        font-size: 0.95rem;
       }
 
       .button-group {
-        text-align: center;
-        margin-top: 2rem;
+        margin-top: 1.5rem;
       }
 
-      button {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: #fff;
-        border: none;
-        padding: 1rem 2rem;
-        border-radius: 12px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        position: relative;
-        overflow: hidden;
-      }
-
-      button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-      }
-
-      button:active {
-        transform: translateY(0);
-      }
-
-      button i {
-        margin-right: 0.5rem;
-      }
-
-      .loading {
-        opacity: 0.7;
-        cursor: not-allowed;
-      }
-
-      .explanation {
-        margin-top: 2rem;
-        padding: 1.5rem;
-        background: linear-gradient(135deg, #f7fafc, #edf2f7);
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        display: none;
-      }
-
-      .explanation h2 {
-        margin: 0 0 1.5rem 0;
-        color: #2d3748;
-        font-size: 1.5rem;
-        display: flex;
+      .primary-button {
+        min-width: 220px;
+        display: inline-flex;
         align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 0.95rem 1.4rem;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, #4d8cff, #27d4ff);
+        box-shadow: 0 20px 40px rgba(37, 85, 226, 0.26);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
       }
 
-      .explanation h2 i {
-        margin-right: 0.5rem;
-        color: #667eea;
+      .primary-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 26px 52px rgba(37, 85, 226, 0.32);
       }
 
-      .features-grid {
+      .primary-button.loading {
+        cursor: progress;
+        opacity: 0.95;
+      }
+
+      .spinner {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      .feature-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-      }
-
-      @media (max-width: 768px) {
-        .features-grid {
-          grid-template-columns: 1fr;
-          gap: 1.5rem;
-        }
+        gap: 1.5rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: 1.7rem;
       }
 
       .feature-block {
-        background: #fff;
-        padding: 1.25rem;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        padding: 1.4rem;
+        border-radius: 24px;
+        background: rgba(13, 24, 44, 0.94);
+        border: 1px solid rgba(255, 255, 255, 0.06);
       }
 
       .feature-block h3 {
         margin: 0 0 1rem 0;
-        color: #4a5568;
-        font-size: 1.1rem;
+        font-size: 1rem;
         display: flex;
         align-items: center;
+        gap: 0.8rem;
       }
 
-      .feature-block h3 i {
-        margin-right: 0.5rem;
+      .feature-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.9rem;
       }
 
-      .phishing h3 {
-        color: #e53e3e;
+      .feature-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.78rem 1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        font-size: 0.92rem;
       }
 
-      .legitimate h3 {
-        color: #38a169;
+      .feature-chip i {
+        font-size: 0.92rem;
       }
 
-      .feature-list {
-        list-style: none;
-        padding: 0;
+      .feature-chip.danger {
+        background: rgba(255, 108, 120, 0.18);
+        border-color: rgba(255, 108, 120, 0.24);
+      }
+
+      .feature-chip.success {
+        background: rgba(69, 214, 163, 0.18);
+        border-color: rgba(69, 214, 163, 0.24);
+      }
+
+      .feature-chip.warning {
+        background: rgba(245, 198, 68, 0.18);
+        border-color: rgba(245, 198, 68, 0.24);
+      }
+
+      .message-banner {
+        margin-top: 1.5rem;
+        padding: 1.15rem 1.2rem;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+      }
+
+      .message-banner.error i {
+        color: var(--danger);
+      }
+
+      .message-banner p {
         margin: 0;
-      }
-
-      .feature-list li {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #f7fafc;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .feature-list li:last-child {
-        border-bottom: none;
-      }
-
-      .feature-name {
-        flex: 1;
-        font-weight: 500;
-      }
-
-      .feature-score {
-        font-family: 'Courier New', monospace;
-        font-weight: 600;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.9rem;
-      }
-
-      .positive-score {
-        background: #fed7d7;
-        color: #c53030;
-      }
-
-      .negative-score {
-        background: #c6f6d5;
-        color: #276749;
+        color: var(--text);
       }
 
       .footer {
-        text-align: center;
         margin-top: 2rem;
-        padding-top: 2rem;
-        border-top: 1px solid #e2e8f0;
-        color: #718096;
-        font-size: 0.9rem;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.95rem;
       }
 
-      .footer i {
-        color: #667eea;
-        margin-right: 0.25rem;
+      @media (max-width: 980px) {
+        .hero-grid,
+        .dashboard-grid,
+        .feature-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .topbar {
+          padding: 1rem;
+        }
+
+        .card-content {
+          padding: 1.3rem;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="header">
-        <i class="fas fa-shield-alt"></i>
-        <h1>Phishing Email Detector</h1>
-        <p class="subtitle">Protect yourself from malicious emails with AI-powered analysis</p>
-      </div>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-icon">
+            <i class="fas fa-shield-virus"></i>
+          </div>
+          <div>
+            <strong>Phishing Email Detector</strong>
+            <div class="brand-subtitle">Modern cybersecurity dashboard</div>
+          </div>
+        </div>
+        <div class="status-chip" id="statusChip">
+          <i class="fas fa-signal"></i>
+          <span>Ready to analyze</span>
+        </div>
+      </header>
 
-      <div class="message error" id="errorMessage">
+      <section class="hero-grid">
+        <div class="hero-panel">
+          <span class="eyebrow"><i class="fas fa-user-shield"></i> Cyber threat detection</span>
+          <h1>Scan email content with phishing defense intelligence.</h1>
+          <p class="hero-copy">Paste suspicious email content, analyze it instantly, and review a clear explanation of the strongest phishing and legitimate signals.</p>
+          <div class="hero-chips">
+            <span class="chip"><i class="fas fa-bolt"></i>Fast verdict</span>
+            <span class="chip"><i class="fas fa-eye"></i>Explainable insights</span>
+            <span class="chip"><i class="fas fa-lock"></i>Secure analysis</span>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="metric-card">
+            <div class="metric-title">Powered by</div>
+            <div class="metric-value">AI + metadata</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Report format</div>
+            <div class="metric-value">Confidence & signals</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Deployment</div>
+            <div class="metric-value">Flask + serverless</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="message-banner error" id="errorMessage" style="display: none;">
         <i class="fas fa-exclamation-triangle"></i>
-        <span id="errorText"></span>
+        <p id="errorText"></p>
       </div>
 
-      <div class="message success" id="resultMessage">
-        <div class="result-highlight">
-          <i class="fas fa-check-circle"></i>
-          Prediction: <span id="prediction"></span>
-        </div>
-        <div>Confidence: <span id="confidenceDisplay"></span></div>
-        <div class="confidence-bar">
-          <div class="confidence-fill" id="confidenceBar"></div>
-        </div>
-      </div>
-
-      <div class="explanation" id="explanationDiv">
-        <h2><i class="fas fa-chart-bar"></i>Analysis Breakdown</h2>
-        <div class="features-grid">
-          <div class="feature-block phishing">
-            <h3><i class="fas fa-exclamation-triangle"></i>Phishing Indicators</h3>
-            <ul class="feature-list" id="phishingList">
-            </ul>
+      <section class="dashboard-grid">
+        <article class="card input-card">
+          <div class="card-content">
+            <div class="card-header">
+              <h2>Analysis input</h2>
+              <span class="badge warning"><i class="fas fa-envelope-open-text"></i> Content scan</span>
+            </div>
+            <form id="emailForm">
+              <label class="form-label" for="email_text">
+                <i class="fas fa-keyboard"></i>
+                Email content
+              </label>
+              <textarea id="email_text" name="email_text" placeholder="Paste your email content here...&#10;&#10;Include subject, sender address, links, and message body." required></textarea>
+              <p class="helper-text">The model evaluates message text and metadata to reveal suspicious signals.</p>
+              <div class="button-group">
+                <button type="submit" class="primary-button" id="analyzeBtn">
+                  <i class="fas fa-search"></i>
+                  Analyze Email
+                </button>
+              </div>
+            </form>
           </div>
-          <div class="feature-block legitimate">
-            <h3><i class="fas fa-shield-alt"></i>Legitimate Indicators</h3>
-            <ul class="feature-list" id="legitimateList">
-            </ul>
+        </article>
+
+        <article class="card result-panel">
+          <div class="card-content">
+            <div class="card-header">
+              <h2>Threat verdict</h2>
+              <span class="badge warning" id="resultBadge"><i class="fas fa-clock"></i> Awaiting</span>
+            </div>
+            <div class="status-row">
+              <div class="status-card">
+                <span>Prediction</span>
+                <strong id="prediction">--</strong>
+              </div>
+              <div class="status-card">
+                <span>Confidence</span>
+                <strong id="confidenceDisplay">--</strong>
+              </div>
+            </div>
+            <div class="result-summary">
+              <div class="gauge-ring" id="confidenceGauge" style="--progress: 0; --gauge-color: var(--accent);">
+                <div class="gauge-inner">
+                  <div class="gauge-value" id="gaugeValue">0%</div>
+                  <div class="gauge-text">confidence</div>
+                </div>
+              </div>
+              <div>
+                <div class="metric-title">Score interpretation</div>
+                <p class="hero-copy" style="margin-top: 0.75rem;">The model blends text signals with email metadata to produce an explainable threat confidence score.</p>
+                <div class="progress-track">
+                  <div class="progress-fill" id="confidenceBar"></div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </article>
+      </section>
 
-      <form id="emailForm">
-        <div class="form-group">
-          <label class="form-label" for="email_text">
-            <i class="fas fa-envelope"></i>
-            Email Content
-          </label>
-          <textarea
-            id="email_text"
-            name="email_text"
-            placeholder="Paste your email content here...&#10;&#10;Include the subject line, sender information, and full message body for the most accurate analysis."
-            required
-          ></textarea>
-        </div>
+      <section class="feature-grid" id="analysisSection" style="display:none;">
+        <article class="feature-block phishing">
+          <h3><i class="fas fa-exclamation-triangle"></i>Phishing indicators</h3>
+          <div class="feature-chips" id="phishingList"></div>
+        </article>
+        <article class="feature-block legitimate">
+          <h3><i class="fas fa-shield-alt"></i>Legitimate indicators</h3>
+          <div class="feature-chips" id="legitimateList"></div>
+        </article>
+      </section>
 
-        <div class="button-group">
-          <button type="submit" id="analyzeBtn">
-            <i class="fas fa-search"></i>
-            Analyze Email
-          </button>
-        </div>
-      </form>
-
-      <div class="footer">
-        <i class="fas fa-brain"></i>
-        Powered by Machine Learning
-      </div>
+      <div class="footer">Modern phishing detection with clear verdicts, confidence, and explainable signals.</div>
     </div>
 
     <script>
       const form = document.getElementById('emailForm');
       const button = document.getElementById('analyzeBtn');
       const errorMessage = document.getElementById('errorMessage');
-      const resultMessage = document.getElementById('resultMessage');
-      const explanationDiv = document.getElementById('explanationDiv');
+      const statusChip = document.getElementById('statusChip');
+      const resultBadge = document.getElementById('resultBadge');
+      const analysisSection = document.getElementById('analysisSection');
       const predictionSpan = document.getElementById('prediction');
       const confidenceDisplaySpan = document.getElementById('confidenceDisplay');
+      const gaugeValue = document.getElementById('gaugeValue');
       const confidenceBar = document.getElementById('confidenceBar');
+      const confidenceGauge = document.getElementById('confidenceGauge');
       const phishingList = document.getElementById('phishingList');
       const legitimateList = document.getElementById('legitimateList');
       const errorText = document.getElementById('errorText');
@@ -396,61 +662,52 @@
           return;
         }
 
-        // Show loading state
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        button.innerHTML = '<i class="fas fa-spinner spinner"></i> Analyzing...';
         button.classList.add('loading');
         button.disabled = true;
-
-        // Hide previous messages
         errorMessage.style.display = 'none';
-        resultMessage.style.display = 'none';
-        explanationDiv.style.display = 'none';
+        analysisSection.style.display = 'none';
 
         try {
           const response = await fetch('/api/predict', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email_text: emailText }),
           });
-
           const data = await response.json();
 
           if (!response.ok) {
-            throw new Error(data.error || 'An error occurred');
+            throw new Error(data.error || 'Unable to analyze the email.');
           }
 
-          // Show results
+          const isPhishing = data.prediction === 'phishing';
+          const confidence = Math.round((isPhishing ? data.probabilities.phishing : data.probabilities.legitimate) * 100);
+          const confidenceLabel = `${confidence.toFixed(2)}%`;
+
           predictionSpan.textContent = data.prediction.charAt(0).toUpperCase() + data.prediction.slice(1);
-          confidenceDisplaySpan.textContent = `${data.confidence.toFixed(2)}%`;
-          confidenceBar.style.width = `${data.confidence}%`;
+          confidenceDisplaySpan.textContent = confidenceLabel;
+          gaugeValue.textContent = confidenceLabel;
+          confidenceBar.style.width = `${confidence}%`;
+          confidenceBar.style.background = isPhishing ? 'linear-gradient(90deg, #ff6c78, #ffadc2)' : 'linear-gradient(90deg, #45d6a3, #8cffb9)';
+          confidenceGauge.style.setProperty('--progress', confidence);
+          confidenceGauge.style.setProperty('--gauge-color', isPhishing ? 'var(--danger)' : 'var(--success)');
 
-          resultMessage.style.display = 'block';
+          statusChip.querySelector('span').textContent = isPhishing ? 'Threat detected' : 'Safe to proceed';
+          resultBadge.className = `badge ${isPhishing ? 'danger' : 'success'}`;
+          resultBadge.innerHTML = `<i class="fas ${isPhishing ? 'fa-biohazard' : 'fa-shield-alt'}"></i> ${data.prediction.charAt(0).toUpperCase() + data.prediction.slice(1)}`;
 
-          // Show explanation
-          if (data.explanation) {
-            phishingList.innerHTML = data.explanation.positive.map(item =>
-              `<li>
-                <span class="feature-name">${item.feature}</span>
-                <span class="feature-score positive-score">${item.score.toFixed(3)}</span>
-              </li>`
-            ).join('');
+          phishingList.innerHTML = data.explanation.positive.map(item =>
+            `<span class="feature-chip danger"><i class="fas fa-fire"></i><span>${item.feature} ${item.score.toFixed(3)}</span></span>`
+          ).join('');
 
-            legitimateList.innerHTML = data.explanation.negative.map(item =>
-              `<li>
-                <span class="feature-name">${item.feature}</span>
-                <span class="feature-score negative-score">${item.score.toFixed(3)}</span>
-              </li>`
-            ).join('');
+          legitimateList.innerHTML = data.explanation.negative.map(item =>
+            `<span class="feature-chip success"><i class="fas fa-leaf"></i><span>${item.feature} ${item.score.toFixed(3)}</span></span>`
+          ).join('');
 
-            explanationDiv.style.display = 'block';
-          }
-
+          analysisSection.style.display = 'grid';
         } catch (error) {
           showError(error.message);
         } finally {
-          // Reset button
           button.innerHTML = '<i class="fas fa-search"></i> Analyze Email';
           button.classList.remove('loading');
           button.disabled = false;
@@ -459,7 +716,7 @@
 
       function showError(message) {
         errorText.textContent = message;
-        errorMessage.style.display = 'block';
+        errorMessage.style.display = 'flex';
       }
     </script>
   </body>
