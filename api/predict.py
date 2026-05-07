@@ -48,11 +48,11 @@ def json_response(body, status_code=200):
     }
 
 
-def handler(request):
-    if request.get("method") != "POST":
+def handler(event, context):
+    if event.get("method") != "POST":
         return json_response({"error": "Only POST requests are allowed."}, 405)
 
-    body = request.get("body", "")
+    body = event.get("body", "")
     if isinstance(body, bytes):
         body = body.decode("utf-8")
 
