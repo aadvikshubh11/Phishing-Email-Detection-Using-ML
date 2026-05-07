@@ -4,6 +4,10 @@ from pathlib import Path
 import joblib
 import numpy as np
 
+from flask import Flask
+
+app = Flask(__name__)
+
 MODEL_PATH = Path(__file__).resolve().parent.parent / "model" / "phishing_pipeline.joblib"
 model = None
 
@@ -82,3 +86,7 @@ def handler(request):
             "explanation": explanation,
         }
     )
+
+
+if __name__ == "__main__":
+    app.run()
